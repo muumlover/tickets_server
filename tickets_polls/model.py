@@ -230,13 +230,13 @@ class Ticket(Model):
         batch_id = (ticket_id_base % (uuid.uuid1().hex.upper()))[4:20]
         raise_time = datetime.now()
         batch_res = await TicketBatch.insert_one({'_id': batch_id,
-                                                  'raiser': raiser.mongo_id,
+                                                  'raiser': raiser,
                                                   'raise_time': raise_time,
                                                   'raise_count': raise_count,
                                                   'checker': checker, })
         new_ticket_list = [Ticket(_id=ticket_id_base % (uuid.uuid1().hex.upper()),
                                   batch=batch_res.inserted_id,
-                                  raiser=raiser.mongo_id,
+                                  raiser=raiser,
                                   raise_time=raise_time).to_object(True) for _ in range(raise_count)]
         res = await Ticket.insert_many(new_ticket_list)
         return res.inserted_ids
